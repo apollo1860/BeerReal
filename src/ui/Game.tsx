@@ -3,6 +3,7 @@ import { useNow, useWakeLock } from '../hooks/useGame';
 import type { ClientAction, PlayerView } from '../game/types';
 import type { RoomConnection } from '../net/types';
 import { Announcements } from './Announcements';
+import { Logo } from './Brand';
 import { CardView } from './CardView';
 import { DistributeSheet } from './DistributeSheet';
 import { Feed } from './Feed';
@@ -38,14 +39,21 @@ export function Game({ view, conn, send, onLeave }: Props) {
   return (
     <div className="screen game">
       <header className="topbar">
-        <span className="code-chip">{view.code}</span>
-        <span className="me-chip">
-          {me.name} · 🍺 {me.stats.sipsDrunk}
-        </span>
-        {mission && missionCollapsed && <CollapsedMission mission={mission} now={now} onExpand={() => setMissionCollapsed(false)} />}
-        <button className="icon-btn" aria-label="Menü" onClick={() => setMenu(!menu)}>
-          ☰
-        </button>
+        <div className="topbar-side">
+          <span className="code-chip">{view.code}</span>
+          {mission && missionCollapsed && <CollapsedMission mission={mission} now={now} onExpand={() => setMissionCollapsed(false)} />}
+        </div>
+        <div className="topbar-center">
+          <Logo size="sm" />
+          <span className="me-line">
+            {me.name} · 🍺 {me.stats.sipsDrunk}
+          </span>
+        </div>
+        <div className="topbar-side right">
+          <button className="icon-btn" aria-label="Menü" onClick={() => setMenu(!menu)}>
+            ☰
+          </button>
+        </div>
       </header>
 
       {disconnected && <div className="warning">⚠️ Keine Verbindung zum Host – hat der Host die App noch offen?</div>}

@@ -1,3 +1,4 @@
+import { Avatar, Logo } from './Brand';
 import { MIN_PLAYERS, type ClientAction, type PlayerView, type Tempo } from '../game/types';
 
 interface Props {
@@ -20,7 +21,7 @@ export function Lobby({ view, send, onLeave }: Props) {
 
   return (
     <div className="screen">
-      <h1 className="logo small">BeerReal 🍺</h1>
+      <h1 className="center"><Logo /></h1>
 
       <section className="panel center">
         <div className="muted">Raumcode</div>
@@ -35,7 +36,8 @@ export function Lobby({ view, send, onLeave }: Props) {
         <ul className="players">
           {view.players.map((p) => (
             <li key={p.id}>
-              {p.name}
+              <Avatar name={p.name} me={p.id === view.me} />
+              <span className="grow">{p.name}</span>
               {p.id === view.hostId && <span className="badge">Host</span>}
               {p.id === view.me && <span className="badge me">Du</span>}
             </li>

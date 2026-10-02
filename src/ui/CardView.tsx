@@ -1,6 +1,7 @@
 import { CARD_KIND_LABELS } from '../game/content/cards';
 import { playerName, sips } from '../game/engine';
 import type { ActiveCard, ClientAction, PlayerView } from '../game/types';
+import { Avatar, Logo, Shutter } from './Brand';
 
 interface Props {
   view: PlayerView;
@@ -14,13 +15,26 @@ export function CardView({ view, card, send }: Props) {
   const votes = card.votes ?? {};
   const voted = Object.keys(votes).length;
   const myVote = votes[view.me];
+  // Der erste genannte Spieler „postet“ die Karte – sonst BeerReal selbst
+  const main = card.playerIds[0] ? playerName(view, card.playerIds[0]) : null;
 
   return (
-    <section className={`card kind-${card.kind}`}>
-      <div className="card-label">
-        {label.icon} {label.title} <span className="muted">#{view.cardsPlayed}</span>
-      </div>
-      <p className="card-text">{card.text}</p>
+    <article className="post">
+      <header className="post-head">
+        {main ? <Avatar name={main} /> : <span className="avatar brand">🍺</span>}
+        <div className="post-meta">
+          <strong>{main ?? <Logo size="sm" />}</strong>
+          <span className="muted small">
+            {label.title} · Karte #{view.cardsPlayed}
+          </span>
+        </div>
+      </header>
+
+      <section className={`card kind-${card.kind}`}>
+        <div className="post-inset" aria-hidden>
+          {label.icon}
+        </div>
+        <p className="card-text">{card.text}</p>
 
       {isVote && !card.result && (
         <>
@@ -60,9 +74,9 @@ export function CardView({ view, card, send }: Props) {
         </div>
       )}
 
-      <button className="btn primary big" onClick={() => send({ type: 'nextCard', currentCardId: card.id })}>
-        Nächste Karte →
-      </button>
-    </section>
+      </section>
+
+      <Shutter label="Nächste Karte" onClick={() => send({ type: 'nextCard', currentCardId: card.id })} />
+    </article>
   );
 }

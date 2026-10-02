@@ -1,15 +1,16 @@
 import { playerName, sips } from '../game/engine';
 import type { ClientAction, Offer, PlayerView } from '../game/types';
+import { Notification } from './Brand';
 import { Countdown } from './Countdown';
 
 export function MyOffer({ offer, now, send }: { offer: Offer; now: number; send: (action: ClientAction) => void }) {
   if (offer.status === 'pending') {
     return (
       <section className="panel offer mine">
-        <div className="offer-head">
-          <span>📣 Angebot für dich{offer.round > 1 ? ` · erhöht (Runde ${offer.round})` : ''}</span>
-          <Countdown until={offer.respondBy} now={now} total={offer.respondBy - offer.issuedAt} />
-        </div>
+        <Notification
+          title={offer.round > 1 ? `📈 Erhöhtes Angebot für dich (Runde ${offer.round})` : '📣 Neues Angebot für dich'}
+          right={<Countdown until={offer.respondBy} now={now} total={offer.respondBy - offer.issuedAt} />}
+        />
         <p className="offer-text">{offer.text}</p>
         <p className="reward">Belohnung: {sips(offer.reward)} verteilen</p>
         <div className="row">

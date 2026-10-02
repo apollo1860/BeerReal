@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { backend } from '../hooks/useGame';
+import { Logo } from './Brand';
 
 interface Props {
   busy: boolean;
@@ -17,8 +18,13 @@ export function Home({ busy, onCreate, onJoin }: Props) {
 
   return (
     <div className="screen">
-      <h1 className="logo">BeerReal 🍺</h1>
-      <p className="tagline">Das Trinkspiel mit geheimen Missionen. Ab 3 Spielern, jede*r mit eigenem Handy.</p>
+      <div className="hero">
+        <h1>
+          <Logo size="lg" />
+        </h1>
+        <p className="tagline">Deine Freunde. Echt betrunken.</p>
+        <p className="muted small">Das Trinkspiel mit geheimen Missionen · ab 3 Spielern · jede*r mit eigenem Handy</p>
+      </div>
 
       <label className="field">
         <span>Dein Name</span>

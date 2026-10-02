@@ -3,6 +3,7 @@ import { useGame } from './hooks/useGame';
 import { Game } from './ui/Game';
 import { Home } from './ui/Home';
 import { Lobby } from './ui/Lobby';
+import { Logo } from './ui/Brand';
 import { Scoreboard } from './ui/Scoreboard';
 
 export function App() {
@@ -32,7 +33,7 @@ export function App() {
   } else {
     screen = (
       <div className="screen">
-        <h1 className="logo small">BeerReal 🍺</h1>
+        <h1 className="center"><Logo /></h1>
         <h2>Spiel vorbei!</h2>
         <Scoreboard view={view} />
         <button className="btn" onClick={game.leave}>Neues Spiel</button>

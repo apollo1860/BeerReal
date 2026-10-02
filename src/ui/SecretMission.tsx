@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { sips } from '../game/engine';
 import type { ClientAction, SecretMission } from '../game/types';
+import { Notification } from './Brand';
 import { Countdown, formatRemaining } from './Countdown';
 
 interface Props {
@@ -24,8 +25,9 @@ export function SecretMissionPanel({ mission, now, send, onCollapse }: Props) {
   return (
     <section className="panel secret">
       <div className="secret-head">
-        <span>📩 Private Nachricht</span>
-        <Countdown until={mission.deadline} now={now} total={mission.deadline - mission.issuedAt} />
+        <Notification title="⚠️ Zeit für BeerReal. ⚠️" right={<Countdown until={mission.deadline} now={now} total={mission.deadline - mission.issuedAt} />}>
+          <div className="muted small">Nur für dich. Lass dich nicht erwischen.</div>
+        </Notification>
         <button className="icon-btn small" aria-label="Einklappen" title="Einklappen" onClick={onCollapse}>
           ▴
         </button>

@@ -11,7 +11,7 @@ export function Countdown({ until, now, total }: { until: number; now: number; t
   const urgent = remaining < 60_000;
   return (
     <span className={`countdown ${urgent ? 'urgent' : ''}`}>
-      ⏱ {formatRemaining(remaining)}
+      {formatRemaining(remaining)} übrig
       {total ? <span className="bar" style={{ width: `${Math.max(0, Math.min(100, (remaining / total) * 100))}%` }} /> : null}
     </span>
   );
