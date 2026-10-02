@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ClientAction, PlayerView } from '../game/types';
+import { firebaseBackend } from '../net/firebase';
+import { firebaseEnabled } from '../net/firebaseConfig';
 import { localBackend } from '../net/local';
 import type { GameBackend, RoomConnection, Session } from '../net/types';
 
-// Später: hier auf das Firebase-Backend umschalten.
-const backend: GameBackend = localBackend;
+export const backend: GameBackend = firebaseEnabled ? firebaseBackend : localBackend;
 const SESSION_KEY = 'beerreal:session';
 
 function loadSession(): Session | null {
@@ -92,11 +93,38 @@ export function useGame() {
   };
 }
 
-export function useNow(intervalMs = 1000): number {
+/** Aktuelle Zeit (sekündlich), optional korrigiert um die Abweichung zur Serveruhr. */
+export function useNow(offset = 0, intervalMs = 1000): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = window.setInterval(() => setNow(Date.now()), intervalMs);
     return () => window.clearInterval(t);
   }, [intervalMs]);
-  return now;
+  return now + offset;
+}
+
+/** Bildschirm während des Spiels anlassen (sonst schläft v. a. der Host ein). */
+export function useWakeLock(active: boolean) {
+  useEffect(() => {
+    if (!active || !('wakeLock' in navigator)) return;
+    let lock: WakeLockSentinel | null = null;
+    let cancelled = false;
+    const acquire = () => {
+      if (document.visibilityState !== 'visible') return;
+      navigator.wakeLock
+        .request('screen')
+        .then((l) => {
+          if (cancelled) l.release();
+          else lock = l;
+        })
+        .catch(() => {});
+    };
+    acquire();
+    document.addEventListener('visibilitychange', acquire);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', acquire);
+      lock?.release().catch(() => {});
+    };
+  }, [active]);
 }

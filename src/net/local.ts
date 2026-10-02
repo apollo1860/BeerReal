@@ -1,8 +1,9 @@
 import { applyAction, createGame } from '../game/engine';
 import { roomCode, uid } from '../game/random';
-import { GameError, type Action, type ClientAction, type GameState, type PlayerId, type PlayerView } from '../game/types';
+import type { Action, ClientAction, GameState, PlayerId, PlayerView } from '../game/types';
 import { viewFor } from '../game/view';
-import type { GameBackend, RoomConnection, Session } from './types';
+import { BaseConnection, errorMessage } from './base';
+import type { GameBackend, Session } from './types';
 
 /**
  * Lokales Backend zum Testen ohne Server: Jeder Browser-Tab ist ein Spieler.
@@ -22,50 +23,16 @@ const HEARTBEAT_MS = 4000;
 const JOIN_TIMEOUT_MS = 3000;
 const storageKey = (code: string) => `beerreal:room:${code}`;
 
-abstract class BaseConnection implements RoomConnection {
+abstract class ChannelConnection extends BaseConnection {
   protected channel = new BroadcastChannel(CHANNEL);
-  protected view: PlayerView | null = null;
-  protected seen = Date.now();
-  private listeners = new Set<(view: PlayerView) => void>();
-  private errorListeners = new Set<(message: string) => void>();
-
-  constructor(readonly session: Session) {}
-
-  subscribe(listener: (view: PlayerView) => void) {
-    this.listeners.add(listener);
-    if (this.view) listener(this.view);
-    return () => this.listeners.delete(listener);
-  }
-
-  onError(listener: (message: string) => void) {
-    this.errorListeners.add(listener);
-    return () => this.errorListeners.delete(listener);
-  }
-
-  lastSeen() {
-    return this.seen;
-  }
-
-  protected emitView(view: PlayerView) {
-    this.view = view;
-    this.seen = Date.now();
-    this.listeners.forEach((l) => l(view));
-  }
-
-  protected emitError(message: string) {
-    this.errorListeners.forEach((l) => l(message));
-  }
-
-  abstract send(action: ClientAction): void;
 
   close() {
     this.channel.close();
-    this.listeners.clear();
-    this.errorListeners.clear();
+    super.close();
   }
 }
 
-class HostConnection extends BaseConnection {
+class HostConnection extends ChannelConnection {
   private state: GameState;
   private timers: number[] = [];
 
@@ -135,7 +102,7 @@ class HostConnection extends BaseConnection {
   }
 }
 
-class ClientConnection extends BaseConnection {
+class ClientConnection extends ChannelConnection {
   constructor(session: Session) {
     super(session);
     this.channel.onmessage = (e: MessageEvent<Message>) => {
@@ -180,12 +147,6 @@ class ClientConnection extends BaseConnection {
   }
 }
 
-function errorMessage(err: unknown): string {
-  if (err instanceof GameError) return err.message;
-  console.error(err);
-  return 'Da ist etwas schiefgelaufen.';
-}
-
 function loadRoom(code: string): GameState | null {
   try {
     const raw = localStorage.getItem(storageKey(code));
@@ -196,6 +157,7 @@ function loadRoom(code: string): GameState | null {
 }
 
 export const localBackend: GameBackend = {
+  kind: 'local',
   async createRoom(name) {
     let code = roomCode();
     while (loadRoom(code)) code = roomCode();

@@ -18,11 +18,14 @@ export interface RoomConnection {
   onError(listener: (message: string) => void): () => void;
   /** Zeitpunkt der letzten Nachricht vom Host (für „Verbindung verloren“-Hinweis). */
   lastSeen(): number;
+  /** Abweichung der lokalen Uhr zur Server-/Host-Uhr in ms (für Countdowns). */
+  clockOffset(): number;
   send(action: ClientAction): void;
   close(): void;
 }
 
 export interface GameBackend {
+  readonly kind: 'local' | 'firebase';
   createRoom(name: string): Promise<RoomConnection>;
   joinRoom(code: string, name: string): Promise<RoomConnection>;
   resume(session: Session): Promise<RoomConnection>;

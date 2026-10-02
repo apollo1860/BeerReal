@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { applyAction, createGame, issueMission, issueOffer, OFFER_RESPONSE_MS } from './engine';
 import { seededRng } from './random';
 import { GameError, type Action, type EngineContext, type GameState } from './types';
-import { viewFor } from './view';
+import { privateView, publicView, viewFor } from './view';
 
 function setup(playerCount = 4, seed = 1) {
   let now = 1_000_000;
@@ -74,6 +74,8 @@ describe('Karten', () => {
     expect(g.state.card!.result).toBeUndefined();
     // Stimmen anderer sind vor der Auflösung verborgen
     expect(viewFor(g.state, 'p3').card!.votes).toEqual({ p1: '', p2: '' });
+    expect(viewFor(g.state, 'p1').card!.votes).toEqual({ p1: 'p2', p2: '' });
+    expect(publicView(g.state).card!.votes).toEqual({ p1: '', p2: '' });
     g.act({ type: 'vote', by: 'p3', cardId: 'cx', targetId: 'p2' });
     expect(g.state.card!.result).toEqual({ loserIds: ['p2'], votes: 2 });
     expect(g.state.players.find((p) => p.id === 'p2')!.stats.sipsDrunk).toBe(2);
@@ -114,6 +116,8 @@ describe('Geheime Missionen', () => {
     const other = s.players.find((p) => p.id !== mission.playerId)!.id;
     expect(viewFor(s, mission.playerId).missions).toHaveLength(1);
     expect(viewFor(s, other).missions).toHaveLength(0);
+    expect(publicView(s).missions).toHaveLength(0);
+    expect(privateView(s, mission.playerId).missions).toHaveLength(1);
   });
 
   it('Erfolg -> verteilen, Misserfolg -> Strafschlücke, Ablauf -> Strafschlücke', () => {

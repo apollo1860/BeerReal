@@ -1,0 +1,47 @@
+{
+  "rules": {
+    "rooms": {
+      "$code": {
+        "meta": {
+          ".read": "auth != null",
+          ".write": "auth != null && !data.exists() && newData.child('hostId').val() === auth.uid",
+          ".validate": "newData.hasChildren(['hostId', 'createdAt'])"
+        },
+        "public": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid",
+          ".validate": "newData.isString() && newData.val().length < 200000"
+        },
+        "host": {
+          ".read": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid",
+          ".write": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid",
+          ".validate": "newData.isString() && newData.val().length < 400000"
+        },
+        "hostSeen": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid"
+        },
+        "private": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid",
+            ".validate": "newData.isString() && newData.val().length < 50000"
+          }
+        },
+        "errors": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid"
+          }
+        },
+        "actions": {
+          ".read": "auth != null && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid",
+          "$id": {
+            ".write": "auth != null && root.child('rooms/' + $code + '/meta').exists() && ((!data.exists() && newData.child('by').val() === auth.uid) || (!newData.exists() && root.child('rooms/' + $code + '/meta/hostId').val() === auth.uid))",
+            ".validate": "newData.hasChildren(['by', 'action', 'at']) && newData.child('action').isString() && newData.child('action').val().length < 5000"
+          }
+        }
+      }
+    }
+  }
+}

@@ -16,16 +16,35 @@ Trinkspiel für **mindestens 3 Spieler**, jede*r mit dem eigenen Handy im selben
 - **Verteilen**: Wer Schlücke verteilen darf, macht das direkt in der App. Am Ende gibt es eine Statistik mit Awards.
 - **Einstellungen** in der Lobby: Tempo (chillig / normal / chaos), Missionen & Angebote an/aus, Spicy-Inhalte an/aus.
 
-## Starten
+## Firebase einrichten (einmalig, ca. 10 Minuten)
+
+1. Auf <https://console.firebase.google.com> ein neues Projekt anlegen (Google Analytics braucht ihr nicht).
+2. **Build → Authentication → Jetzt starten → Anmeldemethode „Anonym“ aktivieren.**
+3. **Build → Realtime Database → Datenbank erstellen** (Standort z. B. `europe-west1`, Start im *gesperrten Modus*).
+   Dann im Tab **Regeln** den Inhalt von [`database.rules.json`](database.rules.json) einfügen und **Veröffentlichen**.
+4. **Projekteinstellungen (Zahnrad) → Allgemein → Deine Apps → Web-App (`</>`) hinzufügen.** Die angezeigte `firebaseConfig` brauchst du gleich.
+5. Die Werte eintragen – je nachdem, wo die App laufen soll:
+   - **GitHub Pages** (kein eigener Rechner nötig): Im Repo unter *Settings → Secrets and variables → Actions → Variables* diese Variablen anlegen:
+     `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_DATABASE_URL`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`.
+     Dann *Settings → Pages → Source: GitHub Actions*. Jeder Push auf `main` (oder *Actions → Deploy auf GitHub Pages → Run workflow*) veröffentlicht die App unter `https://<user>.github.io/BeerReal/`.
+     In Firebase unter *Authentication → Einstellungen → Autorisierte Domains* `<user>.github.io` hinzufügen.
+   - **Lokal / Firebase Hosting**: `.env.example` nach `.env.local` kopieren und ausfüllen. `npm run dev` startet die App im WLAN (die Adresse unter „Network“ auf den Handys öffnen), `npm run deploy` veröffentlicht sie auf Firebase Hosting (`npx firebase-tools login` und `npx firebase-tools use --add` vorher einmal ausführen).
+
+Ohne Firebase-Konfiguration startet die App im **lokalen Testmodus** (mehrere Tabs im selben Browser). Mit `?local` in der URL kann man diesen Modus auch erzwingen.
+
+## Entwickeln
 
 ```bash
 npm install
-npm run dev       # http://localhost:5173
-npm test          # Engine-Tests
+npm run dev            # App (Firebase, falls .env.local existiert, sonst Tab-Modus)
+npm test               # Engine-Tests
 npm run build
+
+npm run emulators      # Firebase-Emulatoren (braucht Java)
+npm run dev:emulator   # App gegen die Emulatoren
 ```
 
-Aktuell läuft das Spiel im **lokalen Testmodus**: Alle Spieler müssen im selben Browser sein – einfach mehrere Tabs öffnen, in einem den Raum erstellen und in den anderen mit dem Code beitreten. Im Dev-Modus hat der Host im Menü (☰) Buttons, um sofort eine Mission bzw. ein Angebot auszulösen.
+Im Dev-Modus hat der Host im Menü (☰) Buttons, um sofort eine Mission bzw. ein Angebot auszulösen.
 
 ## Aufbau
 
@@ -41,11 +60,18 @@ src/net/
 src/ui/              React-Screens
 ```
 
-## Firebase (nächster Schritt)
+## Wie Firebase genutzt wird
 
-Die UI spricht nur mit `GameBackend` (`src/net/types.ts`). Für Firebase wird ein zweites Backend gebaut und in `src/hooks/useGame.ts` eingetragen. Geplanter Aufbau:
+Das Handy, das den Raum erstellt (Host), führt die Spiel-Engine aus. Alle anderen schicken nur Aktionen.
 
-- `rooms/{code}` – öffentlicher Zustand (Spieler, Karte, Angebote, Feed)
-- `rooms/{code}/private/{playerId}` – eigene geheime Missionen (per Security Rules nur für diesen Spieler lesbar)
-- `rooms/{code}/actions` – Aktionen der Spieler; ausgewertet vom Host-Client oder einer Cloud Function mit derselben `engine.ts`
-- Zeiten über Server-Timestamps abgleichen
+| Pfad | Inhalt | Wer darf lesen / schreiben |
+| --- | --- | --- |
+| `rooms/{code}/meta` | Host-ID | alle lesen, einmalig anlegen |
+| `rooms/{code}/public` | öffentlicher Spielstand | alle lesen, nur Host schreibt |
+| `rooms/{code}/private/{uid}` | eigene geheime Mission, eigene Stimme | nur dieser Spieler liest |
+| `rooms/{code}/host` | kompletter Zustand (für Reload) | nur Host |
+| `rooms/{code}/actions` | Aktionen der Spieler | Spieler legen an, Host liest & löscht |
+
+Geheime Missionen sind also auch über die Entwicklertools nicht für andere sichtbar.
+
+**Wichtig:** Der Host muss die App während des Spiels offen haben (der Bildschirm bleibt automatisch an). Ist das Host-Handy weg, pausiert das Spiel und läuft weiter, sobald es zurück ist.

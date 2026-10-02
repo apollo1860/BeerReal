@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { backend } from '../hooks/useGame';
 
 interface Props {
   busy: boolean;
@@ -61,9 +62,13 @@ export function Home({ busy, onCreate, onJoin }: Props) {
         Neuen Raum erstellen
       </button>
 
-      <p className="hint">
-        🧪 Lokaler Testmodus: Mitspielen geht vorerst nur im selben Browser – öffne einfach weitere Tabs und tritt mit dem Code bei.
-      </p>
+      {backend.kind === 'local' ? (
+        <p className="hint">
+          🧪 Lokaler Testmodus (kein Firebase konfiguriert): Mitspielen geht nur im selben Browser – öffne weitere Tabs und tritt mit dem Code bei.
+        </p>
+      ) : (
+        <p className="hint">📱 Alle öffnen diese Seite auf ihrem Handy und treten mit dem Code bei. Der Host sollte die App während des Spiels offen lassen.</p>
+      )}
     </div>
   );
 }

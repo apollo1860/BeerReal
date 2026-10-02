@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNow } from '../hooks/useGame';
+import { useNow, useWakeLock } from '../hooks/useGame';
 import type { ClientAction, PlayerView } from '../game/types';
 import type { RoomConnection } from '../net/types';
 import { CardView } from './CardView';
@@ -17,7 +17,8 @@ interface Props {
 }
 
 export function Game({ view, conn, send, onLeave }: Props) {
-  const now = useNow();
+  const now = useNow(conn.clockOffset());
+  useWakeLock(true);
   const [menu, setMenu] = useState(false);
   const me = view.players.find((p) => p.id === view.me)!;
   const isHost = view.hostId === view.me;
@@ -30,7 +31,7 @@ export function Game({ view, conn, send, onLeave }: Props) {
   useBuzz(mission?.id, [80, 60, 80]);
   useBuzz(myOffer?.status === 'pending' ? `${myOffer.id}-${myOffer.round}` : undefined, [150]);
 
-  const disconnected = !conn.session.isHost && now - conn.lastSeen() > 12_000;
+  const disconnected = !conn.session.isHost && Date.now() - conn.lastSeen() > 30_000;
 
   return (
     <div className="screen game">
@@ -44,7 +45,7 @@ export function Game({ view, conn, send, onLeave }: Props) {
         </button>
       </header>
 
-      {disconnected && <div className="warning">⚠️ Keine Verbindung zum Host – ist der Host-Tab noch offen?</div>}
+      {disconnected && <div className="warning">⚠️ Keine Verbindung zum Host – hat der Host die App noch offen?</div>}
 
       {menu && (
         <section className="panel">
