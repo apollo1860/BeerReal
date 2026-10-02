@@ -603,3 +603,76 @@ input:not([type='checkbox']) {
 .secret-head > span:first-child {
   flex: 1;
 }
+
+/* Einblendungen für alle */
+
+.announce-backdrop {
+  align-items: center;
+  z-index: 15;
+  padding: 16px;
+}
+
+.announce {
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 22px;
+  width: 100%;
+  max-width: 420px;
+  padding: 22px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+  animation: pop 0.25s ease-out;
+}
+
+.announce-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.announce h2 {
+  font-size: 1.3rem;
+}
+
+.announce-text {
+  color: var(--muted);
+}
+
+.announce-sips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.announce-sips li {
+  display: flex;
+  justify-content: space-between;
+  background: var(--panel-2);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.announce-sips li.me {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.announce-mine {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -7,6 +7,7 @@ import {
   MIN_PLAYERS,
   type Action,
   type ActiveCard,
+  type Announcement,
   type CardKind,
   type CardTemplate,
   type EngineContext,
@@ -61,6 +62,7 @@ export function createGame(code: string, host: { id: PlayerId; name: string }, n
     offers: [],
     distributions: [],
     feed: [],
+    announcements: [],
     nextMissionAt: null,
     nextOfferAt: null,
     recentTemplates: [],
@@ -138,13 +140,26 @@ export function applyAction(state: GameState, action: Action, ctx: EngineContext
       if (action.success) {
         mission.status = 'success';
         me.stats.missionsWon++;
-        addDistribution(s, ctx, by, mission.reward, 'Geheime Mission erfüllt');
+        addDistribution(s, ctx, by, mission.reward, `Geheime Mission: „${mission.text}“`);
         addFeed(s, ctx, '🕵️', `${me.name} hat eine geheime Mission erfüllt: „${mission.text}“ – und darf ${sips(mission.reward)} verteilen!`);
+        announce(s, ctx, {
+          icon: '🕵️',
+          title: `${me.name} hat eine geheime Mission geschafft!`,
+          text: `„${mission.text}“ – ${me.name} verteilt gleich ${sips(mission.reward)}.`,
+          actorId: by,
+        });
       } else {
         mission.status = 'failed';
         me.stats.missionsFailed++;
         drink(s, by, mission.penalty);
         addFeed(s, ctx, '🚨', `${me.name} ist an einer geheimen Mission gescheitert: „${mission.text}“ – ${me.name} trinkt ${sips(mission.penalty)}.`);
+        announce(s, ctx, {
+          icon: '🚨',
+          title: `${me.name} wurde erwischt!`,
+          text: `Geheime Mission: „${mission.text}“`,
+          sips: { [by]: mission.penalty },
+          actorId: by,
+        });
       }
       return s;
     }
@@ -195,6 +210,13 @@ export function applyAction(state: GameState, action: Action, ctx: EngineContext
       s.distributions = s.distributions.filter((d) => d !== dist);
       const list = entries.map(([id, n]) => `${playerName(s, id)} ${n}`).join(', ');
       addFeed(s, ctx, '🍺', `${me.name} verteilt: ${list}.`);
+      announce(s, ctx, {
+        icon: '🍺',
+        title: `${me.name} verteilt ${sips(total)}`,
+        text: dist.reason,
+        sips: Object.fromEntries(entries),
+        actorId: by,
+      });
       return s;
     }
 
@@ -237,6 +259,12 @@ export function tick(state: GameState, ctx: EngineContext): GameState {
     if (player) player.stats.missionsFailed++;
     drink(s, mission.playerId, mission.penalty);
     addFeed(s, ctx, '⏰', `${playerName(s, mission.playerId)} hat eine geheime Mission nicht rechtzeitig geschafft: „${mission.text}“ – trinkt ${sips(mission.penalty)}.`);
+    announce(s, ctx, {
+      icon: '⏰',
+      title: `${playerName(s, mission.playerId)} hat eine geheime Mission verpennt!`,
+      text: `„${mission.text}“`,
+      sips: { [mission.playerId]: mission.penalty },
+    });
   }
 
   for (const offer of s.offers) {
@@ -537,6 +565,15 @@ function addDistribution(s: GameState, ctx: EngineContext, playerId: PlayerId, a
 function drink(s: GameState, id: PlayerId, amount: number) {
   const player = s.players.find((p) => p.id === id);
   if (player) player.stats.sipsDrunk += amount;
+}
+
+const ANNOUNCEMENT_LIMIT = 15;
+
+function announce(s: GameState, ctx: EngineContext, a: Omit<Announcement, 'id' | 'at'>) {
+  // ältere gespeicherte Spielstände haben das Feld noch nicht
+  s.announcements ??= [];
+  s.announcements.push({ id: nextId(s, 'a'), at: ctx.now, ...a });
+  if (s.announcements.length > ANNOUNCEMENT_LIMIT) s.announcements.splice(0, s.announcements.length - ANNOUNCEMENT_LIMIT);
 }
 
 function addFeed(s: GameState, ctx: EngineContext, icon: string, text: string) {

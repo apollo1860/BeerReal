@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNow, useWakeLock } from '../hooks/useGame';
 import type { ClientAction, PlayerView } from '../game/types';
 import type { RoomConnection } from '../net/types';
+import { Announcements } from './Announcements';
 import { CardView } from './CardView';
 import { DistributeSheet } from './DistributeSheet';
 import { Feed } from './Feed';
@@ -89,6 +90,7 @@ export function Game({ view, conn, send, onLeave }: Props) {
       <OpenOffers view={view} now={now} />
       <Feed view={view} />
 
+      <Announcements view={view} />
       {distribution && <DistributeSheet key={distribution.id} view={view} distribution={distribution} send={send} />}
     </div>
   );

@@ -144,6 +144,19 @@ export interface FeedEntry {
   text: string;
 }
 
+/** Große Einblendung für alle Spieler (z. B. Mission geschafft, Schlücke verteilt). */
+export interface Announcement {
+  id: string;
+  at: number;
+  icon: string;
+  title: string;
+  text: string;
+  /** Wer bekommt wie viele Schlücke */
+  sips?: Record<PlayerId, number>;
+  /** Wer das ausgelöst hat – bekommt die Einblendung selbst nicht */
+  actorId?: PlayerId;
+}
+
 export type Tempo = 'chill' | 'normal' | 'chaos';
 
 export interface Settings {
@@ -169,6 +182,7 @@ export interface GameState {
   offers: Offer[];
   distributions: Distribution[];
   feed: FeedEntry[];
+  announcements: Announcement[];
   nextMissionAt: number | null;
   nextOfferAt: number | null;
   recentTemplates: string[];

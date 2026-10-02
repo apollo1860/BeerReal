@@ -135,8 +135,18 @@ describe('Geheime Missionen', () => {
     const other = g.state.players.find((p) => p.id !== a.playerId)!.id;
     expect(viewFor(g.state, other).missions.map((m) => m.id)).toContain(a.id);
 
+    const ann = g.state.announcements.at(-1)!;
+    expect(ann.title).toContain('geheime Mission geschafft');
+    expect(ann.actorId).toBe(a.playerId);
+    const dist = g.state.distributions.find((d) => d.playerId === a.playerId)!;
+    const receiver = g.state.players.find((p) => p.id !== a.playerId)!.id;
+    g.act({ type: 'distribute', by: a.playerId, distributionId: dist.id, allocation: { [receiver]: a.reward } });
+    expect(g.state.announcements.at(-1)!.sips).toEqual({ [receiver]: a.reward });
+    expect(g.state.announcements.at(-1)!.text).toContain(a.text);
+
+    const before = g.state.players.find((p) => p.id === b.playerId)!.stats.sipsDrunk;
     g.act({ type: 'resolveMission', by: b.playerId, missionId: b.id, success: false });
-    expect(g.state.players.find((p) => p.id === b.playerId)!.stats.sipsDrunk).toBe(b.penalty);
+    expect(g.state.players.find((p) => p.id === b.playerId)!.stats.sipsDrunk).toBe(before + b.penalty);
 
     expect(() => g.act({ type: 'resolveMission', by: a.playerId, missionId: c.id, success: true })).toThrow();
     g.advance(11 * 60_000);
