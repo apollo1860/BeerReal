@@ -1,4 +1,4 @@
-import { CARD_KIND_WEIGHTS, CARD_TEMPLATES, KMK_SETS } from './content/cards';
+import { CARD_KIND_WEIGHTS, CARD_TEMPLATES } from './content/cards';
 import { MISSION_TEMPLATES } from './content/missions';
 import { OFFER_TEMPLATES } from './content/offers';
 import { pick, pickWeighted, randInt, randRange, shuffle } from './random';
@@ -384,18 +384,13 @@ export function drawCard(s: GameState, ctx: EngineContext): ActiveCard {
   const players = shuffle(ctx.rng, s.players);
   const n = template.sips ? randRange(ctx.rng, template.sips) : 0;
   const used = new Set<PlayerId>();
-  let text = template.text.replace(/\{p([123])\}/g, (_, idx: string) => {
-    const p = players[Number(idx) - 1] ?? players[0];
-    used.add(p.id);
-    return p.name;
-  });
-  if (text.includes('{x}')) {
-    const others = players.filter((p) => !used.has(p.id));
-    const usePlayers = others.length >= 3 && ctx.rng() < 0.5;
-    const trio = usePlayers ? others.slice(0, 3).map((p) => p.name) : pick(ctx.rng, KMK_SETS);
-    text = text.replace('{x}', trio.join(', '));
-  }
-  text = text.replace(/\{n\}/g, String(n));
+  const text = template.text
+    .replace(/\{p([123])\}/g, (_, idx: string) => {
+      const p = players[Number(idx) - 1] ?? players[0];
+      used.add(p.id);
+      return p.name;
+    })
+    .replace(/\{n\}/g, String(n));
 
   const card: ActiveCard = {
     id: nextId(s, 'c'),

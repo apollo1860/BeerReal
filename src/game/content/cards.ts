@@ -95,9 +95,12 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   c('vote', 'Wer würde eher die Rechnung „vergessen“?', { sips: [2, 3] }),
   c('vote', 'Wer würde eher heiraten, ohne es jemandem zu sagen?', { sips: [2, 3] }),
 
-  // --- Kiss Marry Kill (Personen werden von der Engine eingesetzt) ------------
-  c('kmk', '{p1}: Kiss, Marry, Kill – {x}. Wer kneift, trinkt {n}.', { sips: [3, 4], spicy: true }),
-  c('kmk', '{p1}: Kiss, Marry, Kill – {x}. Begründung ist Pflicht, sonst {n} Schlücke.', { sips: [2, 3], spicy: true }),
+  // --- Kiss Marry Kill (die drei Personen denken sich die Spieler selbst aus) --
+  c('kmk', '{p2} nennt {p1} drei Personen. {p1}: Kiss, Marry, Kill? Wer kneift, trinkt {n}.', { sips: [3, 4], spicy: true }),
+  c('kmk', 'Die Gruppe einigt sich auf drei Personen. {p1}: Kiss, Marry, Kill – mit Begründung, sonst {n} Schlücke.', { sips: [2, 3], spicy: true }),
+  c('kmk', '{p1} denkt sich drei Personen für {p2} aus. {p2}: Kiss, Marry, Kill? Wer sich drückt, trinkt {n}.', { sips: [2, 3], spicy: true }),
+  c('kmk', '{p1} und {p2} nennen abwechselnd drei Personen. {p3} muss Kiss, Marry, Kill entscheiden – oder trinkt {n}.', { sips: [3, 4], spicy: true }),
+  c('kmk', 'Alle schreiben heimlich einen Namen auf, {p1} zieht drei davon: Kiss, Marry, Kill! Kneifen kostet {n} Schlücke.', { sips: [3, 4], spicy: true }),
 
   // --- Ich hab noch nie ---------------------------------------------------
   c('neverHaveIEver', 'Ich hab noch nie … bei einer Prüfung geschummelt. Wer schon, trinkt {n}.', { sips: [1, 2] }),
@@ -143,18 +146,4 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   c('duel', '{p1} gegen {p2}: Wer die Geburtstage von mehr Leuten hier kennt, gewinnt. Verlierer trinkt {n}.', { sips: [2, 3] }),
   c('duel', '{p1} gegen {p2}: Armdrücken. Verlierer trinkt {n}.', { sips: [2, 3] }),
   c('duel', '{p1} gegen {p2}: Wer länger auf einem Bein stehen kann. Verlierer trinkt {n}.', { sips: [2, 3] }),
-];
-
-/** Promi-/Figuren-Trios für Kiss Marry Kill, wenn zu wenige Spieler oder zur Abwechslung. */
-export const KMK_SETS: string[][] = [
-  ['Shrek', 'SpongeBob', 'Patrick Star'],
-  ['Heidi Klum', 'Dieter Bohlen', 'Helene Fischer'],
-  ['Harry Potter', 'Hermine', 'Ron'],
-  ['Batman', 'Spider-Man', 'Iron Man'],
-  ['Barbie', 'Ken', 'Elsa'],
-  ['Capital Bra', 'Apache 207', 'Shirin David'],
-  ['Joko', 'Klaas', 'Palina Rojinski'],
-  ['Jack Sparrow', 'Legolas', 'Aragorn'],
-  ['dein/e Chef/in', 'dein/e Nachbar/in', 'dein/e erste/r Lehrer/in'],
-  ['Taylor Swift', 'Rihanna', 'Billie Eilish'],
 ];
