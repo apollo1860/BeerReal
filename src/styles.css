@@ -378,6 +378,25 @@ input:not([type='checkbox']) {
 
 /* Geheime Mission */
 
+.icon-btn.small {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  flex: none;
+}
+
+.collapsed-mission {
+  font: inherit;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: var(--panel);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
 .secret {
   border: 1px solid #3a3029;
 }
@@ -579,4 +598,8 @@ input:not([type='checkbox']) {
   border-radius: 12px;
   z-index: 20;
   max-width: calc(100% - 32px);
+}
+
+.secret-head > span:first-child {
+  flex: 1;
 }

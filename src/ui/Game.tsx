@@ -7,7 +7,7 @@ import { DistributeSheet } from './DistributeSheet';
 import { Feed } from './Feed';
 import { MyOffer, OpenOffers } from './Offers';
 import { Scoreboard } from './Scoreboard';
-import { SecretMissionPanel } from './SecretMission';
+import { CollapsedMission, SecretMissionPanel, useCollapsed } from './SecretMission';
 
 interface Props {
   view: PlayerView;
@@ -26,6 +26,7 @@ export function Game({ view, conn, send, onLeave }: Props) {
   const mission = view.missions.find((m) => m.playerId === view.me && m.status === 'active') ?? null;
   const myOffer = view.offers.find((o) => o.playerId === view.me && (o.status === 'pending' || o.status === 'accepted')) ?? null;
   const distribution = view.distributions.find((d) => d.playerId === view.me) ?? null;
+  const [missionCollapsed, setMissionCollapsed] = useCollapsed(mission?.id);
 
   // Unauffällig vibrieren, wenn etwas Neues für mich da ist
   useBuzz(mission?.id, [80, 60, 80]);
@@ -40,6 +41,7 @@ export function Game({ view, conn, send, onLeave }: Props) {
         <span className="me-chip">
           {me.name} · 🍺 {me.stats.sipsDrunk}
         </span>
+        {mission && missionCollapsed && <CollapsedMission mission={mission} now={now} onExpand={() => setMissionCollapsed(false)} />}
         <button className="icon-btn" aria-label="Menü" onClick={() => setMenu(!menu)}>
           ☰
         </button>
@@ -71,7 +73,9 @@ export function Game({ view, conn, send, onLeave }: Props) {
         </section>
       )}
 
-      {mission && <SecretMissionPanel mission={mission} now={now} send={send} />}
+      {mission && !missionCollapsed && (
+        <SecretMissionPanel mission={mission} now={now} send={send} onCollapse={() => setMissionCollapsed(true)} />
+      )}
       {myOffer && <MyOffer offer={myOffer} now={now} send={send} />}
 
       {view.rule && (
