@@ -2,7 +2,7 @@ name: Deploy auf GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/sweet-meitner-zyuxii]
   workflow_dispatch:
 
 permissions:
@@ -25,14 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # Firebase-Konfiguration steht in src/net/firebaseConfig.ts
       - run: npm run build
-        env:
-          # Unter Settings → Secrets and variables → Actions → Variables anlegen
-          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_DATABASE_URL: ${{ vars.VITE_FIREBASE_DATABASE_URL }}
-          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

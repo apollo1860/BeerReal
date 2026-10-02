@@ -22,15 +22,14 @@ Trinkspiel für **mindestens 3 Spieler**, jede*r mit dem eigenen Handy im selben
 2. **Build → Authentication → Jetzt starten → Anmeldemethode „Anonym“ aktivieren.**
 3. **Build → Realtime Database → Datenbank erstellen** (Standort z. B. `europe-west1`, Start im *gesperrten Modus*).
    Dann im Tab **Regeln** den Inhalt von [`database.rules.json`](database.rules.json) einfügen und **Veröffentlichen**.
-4. **Projekteinstellungen (Zahnrad) → Allgemein → Deine Apps → Web-App (`</>`) hinzufügen.** Die angezeigte `firebaseConfig` brauchst du gleich.
-5. Die Werte eintragen – je nachdem, wo die App laufen soll:
-   - **GitHub Pages** (kein eigener Rechner nötig): Im Repo unter *Settings → Secrets and variables → Actions → Variables* diese Variablen anlegen:
-     `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_DATABASE_URL`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`.
-     Dann *Settings → Pages → Source: GitHub Actions*. Jeder Push auf `main` (oder *Actions → Deploy auf GitHub Pages → Run workflow*) veröffentlicht die App unter `https://<user>.github.io/BeerReal/`.
-     In Firebase unter *Authentication → Einstellungen → Autorisierte Domains* `<user>.github.io` hinzufügen.
-   - **Lokal / Firebase Hosting**: `.env.example` nach `.env.local` kopieren und ausfüllen. `npm run dev` startet die App im WLAN (die Adresse unter „Network“ auf den Handys öffnen), `npm run deploy` veröffentlicht sie auf Firebase Hosting (`npx firebase-tools login` und `npx firebase-tools use --add` vorher einmal ausführen).
+4. Die Web-App-Konfiguration des Projekts `beerreal-63f6a` steht bereits in [`src/net/firebaseConfig.ts`](src/net/firebaseConfig.ts). Für ein anderes Projekt: `.env.example` nach `.env.local` kopieren und ausfüllen.
+5. Veröffentlichen:
+   - **GitHub Pages**: Im Repo *Settings → Pages → Source: GitHub Actions*. Jeder Push (oder *Actions → Deploy auf GitHub Pages → Run workflow*) veröffentlicht die App unter `https://apollo1860.github.io/BeerReal/`.
+     In Firebase unter *Authentication → Einstellungen → Autorisierte Domains* `apollo1860.github.io` hinzufügen.
+   - **Lokal im WLAN**: `npm run dev` und die „Network“-Adresse auf den Handys öffnen.
+   - **Firebase Hosting**: `npx firebase-tools login`, `npx firebase-tools use --add`, dann `npm run deploy`.
 
-Ohne Firebase-Konfiguration startet die App im **lokalen Testmodus** (mehrere Tabs im selben Browser). Mit `?local` in der URL kann man diesen Modus auch erzwingen.
+Mit `?local` in der URL startet die App im **lokalen Testmodus** (mehrere Tabs im selben Browser, ohne Firebase).
 
 ## Entwickeln
 
