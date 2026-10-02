@@ -64,10 +64,17 @@ function connect() {
     await auth.authStateReady();
     const user = auth.currentUser ?? (await signInAnonymously(auth)).user;
     return { db, uid: user.uid };
-  })().catch((err) => {
+  })().catch((err: { code?: string; message?: string }) => {
     services = null;
     console.error(err);
-    throw new Error('Verbindung zu Firebase fehlgeschlagen. Ist Anonymous Auth aktiviert?');
+    const code = err.code ?? '';
+    if (code.includes('configuration-not-found') || code.includes('operation-not-allowed') || code.includes('admin-restricted')) {
+      throw new Error('Firebase: Anonyme Anmeldung ist nicht aktiviert (Authentication → Anmeldemethode → Anonym).');
+    }
+    if (code.includes('unauthorized-domain') || code.includes('requests-from-referer')) {
+      throw new Error(`Firebase: Domain ${location.hostname} ist nicht autorisiert (Authentication → Einstellungen → Autorisierte Domains).`);
+    }
+    throw new Error(`Verbindung zu Firebase fehlgeschlagen${code ? ` (${code})` : ''}.`);
   });
   return services;
 }
