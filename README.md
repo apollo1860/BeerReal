@@ -1,6 +1,6 @@
 # BeerReal 🍺
 
-Trinkspiel für **mindestens 3 Spieler**, jede*r mit dem eigenen Handy im selben Raum.
+Trinkspiel für **mindestens 2 Spieler**, jede*r mit dem eigenen Handy im selben Raum.
 
 ## Spielprinzip
 

@@ -99,7 +99,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   c('kmk', '{p2} nennt {p1} drei Personen. {p1}: Kiss, Marry, Kill? Wer kneift, trinkt {n}.', { sips: [3, 4], spicy: true }),
   c('kmk', 'Die Gruppe einigt sich auf drei Personen. {p1}: Kiss, Marry, Kill – mit Begründung, sonst {n} Schlücke.', { sips: [2, 3], spicy: true }),
   c('kmk', '{p1} denkt sich drei Personen für {p2} aus. {p2}: Kiss, Marry, Kill? Wer sich drückt, trinkt {n}.', { sips: [2, 3], spicy: true }),
-  c('kmk', '{p1} und {p2} nennen abwechselnd drei Personen. {p3} muss Kiss, Marry, Kill entscheiden – oder trinkt {n}.', { sips: [3, 4], spicy: true }),
+  c('kmk', '{p1} und {p2} nennen abwechselnd drei Personen. {p3} muss Kiss, Marry, Kill entscheiden – oder trinkt {n}.', { sips: [3, 4], spicy: true, minPlayers: 3 }),
   c('kmk', 'Alle schreiben heimlich einen Namen auf, {p1} zieht drei davon: Kiss, Marry, Kill! Kneifen kostet {n} Schlücke.', { sips: [3, 4], spicy: true }),
 
   // --- Ich hab noch nie ---------------------------------------------------

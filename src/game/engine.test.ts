@@ -34,10 +34,10 @@ function setup(playerCount = 4, seed = 1) {
 }
 
 describe('Lobby', () => {
-  it('braucht mindestens 3 Spieler zum Starten', () => {
-    const g = setup(2);
+  it('braucht mindestens 2 Spieler zum Starten', () => {
+    const g = setup(1);
     expect(() => g.act({ type: 'start', by: 'p1' })).toThrow(GameError);
-    g.act({ type: 'join', by: 'p3', name: 'Cara' });
+    g.act({ type: 'join', by: 'p2', name: 'Ben' });
     g.act({ type: 'start', by: 'p1' });
     expect(g.state.phase).toBe('playing');
     expect(g.state.card).not.toBeNull();
@@ -79,6 +79,22 @@ describe('Karten', () => {
     g.act({ type: 'vote', by: 'p3', cardId: 'cx', targetId: 'p2' });
     expect(g.state.card!.result).toEqual({ loserIds: ['p2'], votes: 2 });
     expect(g.state.players.find((p) => p.id === 'p2')!.stats.sipsDrunk).toBe(2);
+  });
+
+  it('läuft mit 2 Spielern: Karten nennen nie dieselbe Person doppelt, Missionen und Angebote klappen', () => {
+    const g = setup(2, 11);
+    g.act({ type: 'start', by: 'p1' });
+    for (let i = 0; i < 300; i++) {
+      const card = g.state.card!;
+      expect(new Set(card.playerIds).size).toBe(card.playerIds.length);
+      expect(card.text).not.toMatch(/\{\w+\}/);
+      g.act({ type: 'nextCard', by: 'p1', currentCardId: card.id });
+    }
+    const s = structuredClone(g.state);
+    const mission = issueMission(s, g.ctx())!;
+    expect(mission.targetIds).not.toContain(mission.playerId);
+    const offer = issueOffer(s, g.ctx())!;
+    expect(offer.targetIds).not.toContain(offer.playerId);
   });
 
   it('erzeugt nie Karten mit offenen Platzhaltern', () => {

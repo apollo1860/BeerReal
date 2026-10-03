@@ -23,7 +23,7 @@ export function Home({ busy, onCreate, onJoin }: Props) {
           <Logo size="lg" />
         </h1>
         <p className="tagline">Deine Freunde. Echt betrunken.</p>
-        <p className="muted small">Das Trinkspiel mit geheimen Missionen · ab 3 Spielern · jede*r mit eigenem Handy</p>
+        <p className="muted small">Das Trinkspiel mit geheimen Missionen · ab 2 Spielern · jede*r mit eigenem Handy</p>
       </div>
 
       <label className="field">
